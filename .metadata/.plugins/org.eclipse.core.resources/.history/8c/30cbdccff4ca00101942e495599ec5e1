@@ -1,0 +1,63 @@
+package br.edu.utfpr.td.cotsi.transacoes.producer;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import br.edu.utfpr.td.cotsi.transacoes.producer.model.Transacao;
+import br.edu.utfpr.td.cotsi.transacoes.producer.service.LeitorArquivo;
+
+@SpringBootApplication
+public class Main implements CommandLineRunner {
+	@Autowired
+    private AmqpAdmin amqpAdmin;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
+    private Queue filaTransacoes;
+
+	public static void main(String[] args) {
+		SpringApplication.run(Main.class, args);
+	}
+	
+	@Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    @PostConstruct
+    public void criarFila() {
+        filaTransacoes = new Queue("transacoes.financeiras", true);
+        amqpAdmin.declareQueue(filaTransacoes);
+    }
+    
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("Iniciando leitura do arquivo...");
+        
+        LeitorArquivo leitor = new LeitorArquivo();
+        List<Transacao> transacoes = leitor.lerArquivo();
+        
+        System.out.println("Encontradas " + transacoes.size() + " transações. Enviando para a fila...");
+
+        for (Transacao t : transacoes) {
+            rabbitTemplate.convertAndSend(filaTransacoes.getName(), t);
+            System.out.println("Enviado: " + t.getCodigo());
+        }
+        
+        System.out.println("Processo de envio finalizado.");
+    }
+
+}

@@ -11,7 +11,6 @@ INDEX VERSION 1.131+C:\Users\Particular\Downloads\APIWEBSERVICES\a4\a4-aw\.metad
 3994073993.index
 4053283309.index
 1865797976.index
-2225085492.index
 3692578035.index
 1241725144.index
 1074633307.index
@@ -25,7 +24,5 @@ INDEX VERSION 1.131+C:\Users\Particular\Downloads\APIWEBSERVICES\a4\a4-aw\.metad
 99031266.index
 2124858783.index
 1411316213.index
-784211865.index
 1034734475.index
 796474767.index
-151597821.index
