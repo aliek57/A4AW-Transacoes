@@ -27,7 +27,6 @@ public class ProdutorRunner implements CommandLineRunner {
 
         for (Transacao t : transacoes) {
             rabbitTemplate.convertAndSend("transacoes.financeiras", t);
-            System.out.println("Enviado código: " + t.getCodigo());
         }
         
         System.out.println("Envio concluído!");
